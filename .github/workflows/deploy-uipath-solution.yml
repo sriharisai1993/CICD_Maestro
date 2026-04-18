@@ -309,12 +309,27 @@ jobs:
           existing_release_version="$(echo "$existing_release_json" | jq -r '.value[0].ProcessVersion // empty')"
 
           if [ -n "$existing_release_id" ]; then
-            echo "Updating process '$process_name' from version '$existing_release_version' to the latest package version in folder '$DEPLOYMENT_FOLDER'."
-            curl -fsS -X POST "$orchestrator_base/odata/Releases($existing_release_id)/UiPath.Server.Configuration.OData.UpdateToLatestPackageVersion" \
+            package_version="$(curl -fsS "$orchestrator_base/odata/Processes/UiPath.Server.Configuration.OData.GetProcessVersions(processId='$package_name')" \
+              -H "Authorization: Bearer $access_token" \
+              -H "X-UIPATH-FolderPath: $DEPLOYMENT_FOLDER" \
+              | jq -r '(.value | map(select(.IsLatestVersion == true)) | first | .Version) // ([.value[]] | sort_by(.Published) | last | .Version)')"
+
+            if [ -z "$package_version" ] || [ "$package_version" = "null" ]; then
+              echo "Could not find an available package version for '$package_name' in folder '$DEPLOYMENT_FOLDER'."
+              exit 1
+            fi
+
+            if [ "$existing_release_version" = "$package_version" ]; then
+              echo "Process '$process_name' is already on latest package version '$package_version' in folder '$DEPLOYMENT_FOLDER'."
+              exit 0
+            fi
+
+            echo "Updating process '$process_name' from version '$existing_release_version' to '$package_version' in folder '$DEPLOYMENT_FOLDER'."
+            curl -fsS -X POST "$orchestrator_base/odata/Releases($existing_release_id)/UiPath.Server.Configuration.OData.UpdateToSpecificPackageVersion" \
               -H "Authorization: Bearer $access_token" \
               -H "Content-Type: application/json" \
               -H "X-UIPATH-FolderPath: $DEPLOYMENT_FOLDER" \
-              --data "{}"
+              --data "{\"packageVersion\":\"$package_version\"}"
           else
             package_version="$(curl -fsS "$orchestrator_base/odata/Processes/UiPath.Server.Configuration.OData.GetProcessVersions(processId='$package_name')" \
               -H "Authorization: Bearer $access_token" \

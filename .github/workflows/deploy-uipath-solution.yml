@@ -177,7 +177,7 @@ jobs:
           fi
 
           echo "PACKAGE_PATH=$package_path" >> "$GITHUB_ENV"
-          echo "DEPLOYMENT_NAME=$SOLUTION_NAME-$DEPLOYMENT_FOLDER-v$SOLUTION_VERSION" >> "$GITHUB_ENV"
+          echo "DEPLOYMENT_NAME=$SOLUTION_NAME-$DEPLOYMENT_FOLDER" >> "$GITHUB_ENV"
 
       - name: Upload solution package
         env:

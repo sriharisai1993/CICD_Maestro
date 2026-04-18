@@ -37,7 +37,7 @@ env:
   UIPATH_CLI_VERSION: 25.10.12
   SOLUTION_VERSION: 1.0.${{ github.run_number }}
   APPLICATION_SCOPE: AutomationSolutions Solutions.Deployments Solutions.Deployments.Read Solutions.Deployments.Write Solutions.Packages Solutions.Packages.Read Solutions.Packages.Write
-  LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE: OR.Folders OR.BackgroundTasks OR.TestSets OR.TestSetExecutions OR.TestSetSchedules OR.Settings.Read OR.Robots.Read OR.Machines.Read OR.Execution OR.Assets OR.Users.Read OR.Jobs OR.Monitoring
+  LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE: OR.Folders OR.Settings.Read
 
 jobs:
   deploy:

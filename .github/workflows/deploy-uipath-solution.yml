@@ -30,6 +30,10 @@ on:
         required: true
         default: true
         type: boolean
+      folder_process_package_name:
+        description: Optional Orchestrator package source name to add as a folder process
+        required: false
+        type: string
       config_path:
         description: Optional solution deployment config path in this repository
         required: false
@@ -189,40 +193,6 @@ jobs:
           echo "PACKAGE_PATH=$package_path" >> "$GITHUB_ENV"
           echo "DEPLOYMENT_NAME=$SOLUTION_NAME-$DEPLOYMENT_FOLDER" >> "$GITHUB_ENV"
 
-      - name: Create or update folder processes
-        if: ${{ github.event_name == 'push' || inputs.create_folder_processes }}
-        env:
-          DEPLOYMENT_FOLDER: ${{ inputs.deployment_folder || 'Shared' }}
-          ORCHESTRATOR_URL: ${{ secrets.ORCHESTRATOR_URL }}
-          ORCHESTRATOR_TENANT: ${{ secrets.ORCHESTRATOR_TENANT }}
-          ORG_NAME: ${{ secrets.ORG_NAME }}
-          EXTERNAL_APP_ID: ${{ secrets.EXTERNAL_APP_ID }}
-          EXTERNAL_APP_SECRET: ${{ secrets.EXTERNAL_APP_SECRET }}
-        run: |
-          mkdir -p "$RUNNER_TEMP/process-packages"
-
-          find "$RUNNER_TEMP/uipath-restore" "$RUNNER_TEMP/packages" \
-            -type f \
-            -name "*.nupkg" \
-            -exec cp -n {} "$RUNNER_TEMP/process-packages" \;
-
-          if ! find "$RUNNER_TEMP/process-packages" -maxdepth 1 -type f -name "*.nupkg" -print -quit | grep -q .; then
-            echo "No .nupkg package files found to deploy as folder processes."
-            exit 1
-          fi
-
-          find "$RUNNER_TEMP/process-packages" -maxdepth 1 -type f -name "*.nupkg" -print
-
-          uipcli package deploy "$RUNNER_TEMP/process-packages" "$ORCHESTRATOR_URL" "$ORCHESTRATOR_TENANT" \
-            -A "$ORG_NAME" \
-            -I "$EXTERNAL_APP_ID" \
-            -S "$EXTERNAL_APP_SECRET" \
-            --applicationScope "$LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE" \
-            -o "$DEPLOYMENT_FOLDER" \
-            --createProcess true \
-            --ignoreLibraryDeployConflict \
-            --traceLevel Information
-
       - name: Upload solution package
         env:
           ORCHESTRATOR_URL: ${{ secrets.ORCHESTRATOR_URL }}
@@ -292,6 +262,82 @@ jobs:
             -S "$EXTERNAL_APP_SECRET" \
             --applicationScope "$APPLICATION_SCOPE" \
             --traceLevel Information
+
+      - name: Create folder process from package source
+        if: ${{ github.event_name == 'push' || inputs.create_folder_processes }}
+        env:
+          DEPLOYMENT_FOLDER: ${{ inputs.deployment_folder || 'Shared' }}
+          FOLDER_PROCESS_PACKAGE_NAME: ${{ inputs.folder_process_package_name }}
+          ORCHESTRATOR_URL: ${{ secrets.ORCHESTRATOR_URL }}
+          ORCHESTRATOR_TENANT: ${{ secrets.ORCHESTRATOR_TENANT }}
+          ORG_NAME: ${{ secrets.ORG_NAME }}
+          EXTERNAL_APP_ID: ${{ secrets.EXTERNAL_APP_ID }}
+          EXTERNAL_APP_SECRET: ${{ secrets.EXTERNAL_APP_SECRET }}
+        run: |
+          package_name="$FOLDER_PROCESS_PACKAGE_NAME"
+          if [ -z "$package_name" ]; then
+            package_name="$(jq -r '.resource.spec.packageName // empty' resources/solution_folder/process/processOrchestration/*.json | head -n 1)"
+          fi
+
+          if [ -z "$package_name" ]; then
+            echo "Could not determine the package source name for the folder process."
+            exit 1
+          fi
+
+          process_name="$package_name"
+          orchestrator_base="${ORCHESTRATOR_URL%/}/${ORG_NAME}/${ORCHESTRATOR_TENANT}/orchestrator_"
+          identity_url="${ORCHESTRATOR_URL%/}/identity_/connect/token"
+
+          access_token="$(curl -fsS -X POST "$identity_url" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            --data-urlencode "grant_type=client_credentials" \
+            --data-urlencode "client_id=$EXTERNAL_APP_ID" \
+            --data-urlencode "client_secret=$EXTERNAL_APP_SECRET" \
+            --data-urlencode "scope=$LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE" \
+            | jq -r '.access_token')"
+
+          if [ -z "$access_token" ] || [ "$access_token" = "null" ]; then
+            echo "Could not retrieve an Orchestrator access token."
+            exit 1
+          fi
+
+          existing_release_count="$(curl -fsS "$orchestrator_base/odata/Releases?\$filter=Name%20eq%20'$process_name'&\$count=true" \
+            -H "Authorization: Bearer $access_token" \
+            -H "X-UIPATH-FolderPath: $DEPLOYMENT_FOLDER" \
+            | jq -r '."@odata.count" // (.value | length)')"
+
+          if [ "$existing_release_count" -gt 0 ]; then
+            echo "Process '$process_name' already exists in folder '$DEPLOYMENT_FOLDER'."
+            exit 0
+          fi
+
+          package_version="$(curl -fsS "$orchestrator_base/odata/Processes/UiPath.Server.Configuration.OData.GetProcessVersions(processId='$package_name')" \
+            -H "Authorization: Bearer $access_token" \
+            -H "X-UIPATH-FolderPath: $DEPLOYMENT_FOLDER" \
+            | jq -r '(.value | map(select(.IsLatestVersion == true)) | first | .Version) // ([.value[]] | sort_by(.Published) | last | .Version)')"
+
+          if [ -z "$package_version" ] || [ "$package_version" = "null" ]; then
+            echo "Could not find an available package version for '$package_name' in folder '$DEPLOYMENT_FOLDER'."
+            exit 1
+          fi
+
+          jq -n \
+            --arg name "$process_name" \
+            --arg processKey "$package_name" \
+            --arg processVersion "$package_version" \
+            --arg description "Created by GitHub Actions" \
+            '{
+              Name: $name,
+              ProcessKey: $processKey,
+              ProcessVersion: $processVersion,
+              Description: $description
+            }' > "$RUNNER_TEMP/create-release.json"
+
+          curl -fsS -X POST "$orchestrator_base/odata/Releases" \
+            -H "Authorization: Bearer $access_token" \
+            -H "Content-Type: application/json" \
+            -H "X-UIPATH-FolderPath: $DEPLOYMENT_FOLDER" \
+            --data @"$RUNNER_TEMP/create-release.json"
 
       - name: Upload packed solution artifact
         if: always()

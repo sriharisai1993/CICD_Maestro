@@ -37,6 +37,7 @@ env:
   UIPATH_CLI_VERSION: 25.10.6
   SOLUTION_VERSION: 1.0.${{ github.run_number }}
   APPLICATION_SCOPE: AutomationSolutions Solutions.Deployments Solutions.Deployments.Read Solutions.Deployments.Write Solutions.Packages Solutions.Packages.Read Solutions.Packages.Write
+  LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE: OR.Folders OR.BackgroundTasks OR.TestSets OR.TestSetExecutions OR.TestSetSchedules OR.Settings.Read OR.Robots.Read OR.Machines.Read OR.Execution OR.Assets OR.Users.Read OR.Jobs OR.Monitoring
 
 jobs:
   deploy:
@@ -82,6 +83,7 @@ jobs:
 
       - name: Restore solution dependencies
         env:
+          DEPLOYMENT_FOLDER: ${{ inputs.deployment_folder || 'Shared' }}
           ORCHESTRATOR_URL: ${{ secrets.ORCHESTRATOR_URL }}
           ORCHESTRATOR_TENANT: ${{ secrets.ORCHESTRATOR_TENANT }}
           ORG_NAME: ${{ secrets.ORG_NAME }}
@@ -89,12 +91,13 @@ jobs:
           EXTERNAL_APP_SECRET: ${{ secrets.EXTERNAL_APP_SECRET }}
         run: |
           uipcli solution restore "$SOLUTION_PATH" \
-            -U "$ORCHESTRATOR_URL" \
-            -T "$ORCHESTRATOR_TENANT" \
-            -A "$ORG_NAME" \
+            --libraryOrchestratorUrl "$ORCHESTRATOR_URL" \
+            --libraryOrchestratorTenant "$ORCHESTRATOR_TENANT" \
+            --libraryOrchestratorAccountForApp "$ORG_NAME" \
             -I "$EXTERNAL_APP_ID" \
             -S "$EXTERNAL_APP_SECRET" \
-            --applicationScope "$APPLICATION_SCOPE" \
+            --libraryOrchestratorApplicationScope "$LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE" \
+            --libraryOrchestratorFolder "$DEPLOYMENT_FOLDER" \
             --restoreFolder "$RUNNER_TEMP/uipath-restore" \
             --traceLevel Information
 

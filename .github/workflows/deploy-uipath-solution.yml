@@ -81,8 +81,20 @@ jobs:
           echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 
       - name: Restore solution dependencies
+        env:
+          ORCHESTRATOR_URL: ${{ secrets.ORCHESTRATOR_URL }}
+          ORCHESTRATOR_TENANT: ${{ secrets.ORCHESTRATOR_TENANT }}
+          ORG_NAME: ${{ secrets.ORG_NAME }}
+          EXTERNAL_APP_ID: ${{ secrets.EXTERNAL_APP_ID }}
+          EXTERNAL_APP_SECRET: ${{ secrets.EXTERNAL_APP_SECRET }}
         run: |
           uipcli solution restore "$SOLUTION_PATH" \
+            -U "$ORCHESTRATOR_URL" \
+            -T "$ORCHESTRATOR_TENANT" \
+            -A "$ORG_NAME" \
+            -I "$EXTERNAL_APP_ID" \
+            -S "$EXTERNAL_APP_SECRET" \
+            --applicationScope "$APPLICATION_SCOPE" \
             --restoreFolder "$RUNNER_TEMP/uipath-restore" \
             --traceLevel Information
 

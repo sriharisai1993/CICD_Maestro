@@ -1,0 +1,62 @@
+{
+  "docVersion": "1.0.0",
+  "resource": {
+    "name": "RPA_CICD",
+    "kind": "process",
+    "type": "process",
+    "apiVersion": "orchestrator.uipath.com/v1",
+    "isOverridable": true,
+    "dependencies": [
+      {
+        "name": "RPA_CICD",
+        "kind": "Package"
+      }
+    ],
+    "runtimeDependencies": [],
+    "files": [],
+    "folders": [
+      {
+        "fullyQualifiedName": "solution_folder"
+      }
+    ],
+    "spec": {
+      "type": "Process",
+      "jobPriority": "Medium",
+      "jobRecording": "Disabled",
+      "duration": null,
+      "frequency": null,
+      "quality": null,
+      "remoteControlAccess": "None",
+      "name": "RPA_CICD",
+      "package": {
+        "name": "RPA_CICD",
+        "key": "RPA_CICD:1.0.230173813"
+      },
+      "packageName": "RPA_CICD",
+      "packageVersion": "1.0.230173813",
+      "entryPointUniqueId": null,
+      "entryPointName": null,
+      "inputArguments": null,
+      "inputArgumentsSchema": null,
+      "outputArgumentsSchema": null,
+      "inputArgumentsSchemaV2": null,
+      "outputArgumentsSchemaV2": null,
+      "hiddenForAttendedUser": false,
+      "alwaysRunning": false,
+      "autoStartProcess": false,
+      "targetFrameworkValue": "Windows",
+      "retentionAction": "Delete",
+      "retentionPeriod": 30,
+      "retentionBucketRef": null,
+      "staleRetentionAction": "Delete",
+      "staleRetentionPeriod": 180,
+      "staleRetentionBucketRef": null,
+      "entryPoints": "[{\u0022UniqueId\u0022:\u0022129babb0-a31a-44bb-a890-b005287d5202\u0022,\u0022Path\u0022:\u0022Main.xaml\u0022,\u0022DisplayName\u0022:null,\u0022InputArguments\u0022:\u0022{\\n  \\\u0022type\\\u0022: \\\u0022object\\\u0022,\\n  \\\u0022properties\\\u0022: {\\n    \\\u0022in_AgentResponse\\\u0022: {\\n      \\\u0022type\\\u0022: \\\u0022string\\\u0022\\n    }\\n  },\\n  \\\u0022required\\\u0022: []\\n}\u0022,\u0022OutputArguments\u0022:null,\u0022Type\u0022:1,\u0022TargetRuntime\u0022:null,\u0022ContentRoot\u0022:null,\u0022DataVariation\u0022:null,\u0022Id\u0022:6088516}]",
+      "connections": null,
+      "tags": [],
+      "description": "Created by UiPath"
+    },
+    "locks": [],
+    "key": "b80e7319-f014-4fc3-9ef0-e8fd338d7112"
+  }
+}

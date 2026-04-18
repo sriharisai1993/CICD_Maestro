@@ -1,0 +1,13 @@
+{
+  "DocVersion": "1.0.0",
+  "StudioMinVersion": "2025.04.0",
+  "SolutionId": "b48f1bd6-1f07-4bed-89e8-08de9ba65a0d",
+  "Projects": [
+    {
+      "Type": "ProcessOrchestration",
+      "ProjectRelativePath": "CICD_Maestro_AGenticOrchestration/project.uiproj",
+      "Id": "c0af1007-6ab3-40fa-a4e8-81e0b53ddfae"
+    }
+  ],
+  "AutomationHubIdeaUrl": null
+}

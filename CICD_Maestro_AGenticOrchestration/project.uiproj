@@ -1,0 +1,6 @@
+{
+  "ProjectType": "ProcessOrchestration",
+  "Name": "CICD_Maestro_AGenticOrchestration",
+  "Description": null,
+  "MainFile": null
+}

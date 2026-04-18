@@ -1,0 +1,54 @@
+{
+  "docVersion": "1.0.0",
+  "resource": {
+    "name": "CICD_Maestro_AGenticOrchestration",
+    "kind": "process",
+    "type": "processOrchestration",
+    "apiVersion": "orchestrator.uipath.com/v1",
+    "projectKey": "c0af1007-6ab3-40fa-a4e8-81e0b53ddfae",
+    "isOverridable": true,
+    "dependencies": [
+      {
+        "name": "CICD_Maestro_AGenticOrchestration",
+        "kind": "package"
+      }
+    ],
+    "runtimeDependencies": [],
+    "files": [],
+    "folders": [
+      {
+        "fullyQualifiedName": "solution_folder"
+      }
+    ],
+    "spec": {
+      "entryPointUniqueId": null,
+      "inputArgumentsSchema": null,
+      "inputArgumentsSchemaV2": null,
+      "type": "ProcessOrchestration",
+      "name": "CICD_Maestro_AGenticOrchestration",
+      "description": null,
+      "package": {
+        "key": "847c371c-c120-429f-ab7b-c4f8aae1dfb0"
+      },
+      "packageName": "CICD_Maestro.agentic.CICD_Maestro_AGenticOrchestration",
+      "packageVersion": null,
+      "entryPointName": null,
+      "inputArguments": "{}",
+      "hiddenForAttendedUser": false,
+      "alwaysRunning": false,
+      "autoStartProcess": false,
+      "targetFrameworkValue": "Portable",
+      "retentionAction": "Delete",
+      "retentionPeriod": 30,
+      "retentionBucketRef": null,
+      "staleRetentionAction": "Delete",
+      "staleRetentionPeriod": 180,
+      "staleRetentionBucketRef": null,
+      "entryPoints": null,
+      "connections": null,
+      "tags": []
+    },
+    "locks": [],
+    "key": "57a2bf27-7113-46b0-ad73-5a1c68754374"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "docVersion": "1.0.0",
+  "resource": {
+    "name": "MathAgent",
+    "kind": "process",
+    "type": "agent",
+    "apiVersion": "orchestrator.uipath.com/v1",
+    "isOverridable": true,
+    "dependencies": [
+      {
+        "name": "CICD_MathAgent.agent.MathAgent",
+        "kind": "Package"
+      }
+    ],
+    "runtimeDependencies": [],
+    "files": [],
+    "folders": [
+      {
+        "fullyQualifiedName": "solution_folder"
+      }
+    ],
+    "spec": {
+      "type": "Agent",
+      "agentMemory": false,
+      "targetRuntime": null,
+      "environmentVariables": "",
+      "referencedAssets": null,
+      "name": "MathAgent",
+      "package": {
+        "name": "CICD_MathAgent.agent.MathAgent",
+        "key": "CICD_MathAgent.agent.MathAgent:1.0.5"
+      },
+      "packageName": "CICD_MathAgent.agent.MathAgent",
+      "packageVersion": "1.0.5",
+      "entryPointUniqueId": "26577846-3279-4472-b285-99d32d5cc44a",
+      "entryPointName": "content/agent.json",
+      "inputArguments": null,
+      "inputArgumentsSchema": null,
+      "outputArgumentsSchema": null,
+      "inputArgumentsSchemaV2": "{\n  \u0022type\u0022: \u0022object\u0022,\n  \u0022properties\u0022: {\n    \u0022question\u0022: {\n      \u0022type\u0022: \u0022string\u0022,\n      \u0022description\u0022: \u0022The basic math question to be answered (e.g., \u0027What is 25 * 4?\u0027, \u0027What is 15% of 200?\u0027, \u0027Solve: 3x \u002B 5 = 20\u0027). Must be a valid math question. Do not leave empty.\u0022\n    }\n  },\n  \u0022required\u0022: [\n    \u0022question\u0022\n  ]\n}",
+      "outputArgumentsSchemaV2": "{\n  \u0022type\u0022: \u0022object\u0022,\n  \u0022properties\u0022: {\n    \u0022answer\u0022: {\n      \u0022type\u0022: \u0022string\u0022,\n      \u0022description\u0022: \u0022The final result of the math calculation or problem (e.g., \u0027100\u0027, \u002742.5\u0027, \u0027x = 5\u0027). If the input is not a math question, set to \u0027N/A\u0027.\u0022\n    },\n    \u0022steps\u0022: {\n      \u0022type\u0022: \u0022string\u0022,\n      \u0022description\u0022: \u0022A brief, clear explanation of how the answer was derived, showing key calculation steps. If the input is not a math question, explain that only math questions are supported.\u0022\n    },\n    \u0022operation_type\u0022: {\n      \u0022type\u0022: \u0022string\u0022,\n      \u0022description\u0022: \u0022The type of math operation used to solve the problem (e.g., \u0027addition\u0027, \u0027subtraction\u0027, \u0027multiplication\u0027, \u0027division\u0027, \u0027percentage\u0027, \u0027algebra\u0027, \u0027fractions\u0027, \u0027exponents\u0027). Set to \u0027N/A\u0027 if not applicable.\u0022\n    }\n  },\n  \u0022required\u0022: [\n    \u0022answer\u0022,\n    \u0022steps\u0022,\n    \u0022operation_type\u0022\n  ]\n}",
+      "hiddenForAttendedUser": false,
+      "alwaysRunning": false,
+      "autoStartProcess": false,
+      "targetFrameworkValue": "Portable",
+      "retentionAction": "Delete",
+      "retentionPeriod": 30,
+      "retentionBucketRef": null,
+      "staleRetentionAction": "Delete",
+      "staleRetentionPeriod": 180,
+      "staleRetentionBucketRef": null,
+      "entryPoints": "[{\u0022UniqueId\u0022:\u002226577846-3279-4472-b285-99d32d5cc44a\u0022,\u0022Path\u0022:\u0022content/agent.json\u0022,\u0022DisplayName\u0022:null,\u0022InputArguments\u0022:\u0022{\\n  \\\u0022type\\\u0022: \\\u0022object\\\u0022,\\n  \\\u0022properties\\\u0022: {\\n    \\\u0022question\\\u0022: {\\n      \\\u0022type\\\u0022: \\\u0022string\\\u0022,\\n      \\\u0022description\\\u0022: \\\u0022The basic math question to be answered (e.g., \u0027What is 25 * 4?\u0027, \u0027What is 15% of 200?\u0027, \u0027Solve: 3x \u002B 5 = 20\u0027). Must be a valid math question. Do not leave empty.\\\u0022\\n    }\\n  },\\n  \\\u0022required\\\u0022: [\\n    \\\u0022question\\\u0022\\n  ]\\n}\u0022,\u0022OutputArguments\u0022:\u0022{\\n  \\\u0022type\\\u0022: \\\u0022object\\\u0022,\\n  \\\u0022properties\\\u0022: {\\n    \\\u0022answer\\\u0022: {\\n      \\\u0022type\\\u0022: \\\u0022string\\\u0022,\\n      \\\u0022description\\\u0022: \\\u0022The final result of the math calculation or problem (e.g., \u0027100\u0027, \u002742.5\u0027, \u0027x = 5\u0027). If the input is not a math question, set to \u0027N/A\u0027.\\\u0022\\n    },\\n    \\\u0022steps\\\u0022: {\\n      \\\u0022type\\\u0022: \\\u0022string\\\u0022,\\n      \\\u0022description\\\u0022: \\\u0022A brief, clear explanation of how the answer was derived, showing key calculation steps. If the input is not a math question, explain that only math questions are supported.\\\u0022\\n    },\\n    \\\u0022operation_type\\\u0022: {\\n      \\\u0022type\\\u0022: \\\u0022string\\\u0022,\\n      \\\u0022description\\\u0022: \\\u0022The type of math operation used to solve the problem (e.g., \u0027addition\u0027, \u0027subtraction\u0027, \u0027multiplication\u0027, \u0027division\u0027, \u0027percentage\u0027, \u0027algebra\u0027, \u0027fractions\u0027, \u0027exponents\u0027). Set to \u0027N/A\u0027 if not applicable.\\\u0022\\n    }\\n  },\\n  \\\u0022required\\\u0022: [\\n    \\\u0022answer\\\u0022,\\n    \\\u0022steps\\\u0022,\\n    \\\u0022operation_type\\\u0022\\n  ]\\n}\u0022,\u0022Type\u0022:4,\u0022TargetRuntime\u0022:null,\u0022ContentRoot\u0022:null,\u0022DataVariation\u0022:null,\u0022Id\u0022:6089670}]",
+      "connections": null,
+      "tags": [],
+      "description": null
+    },
+    "locks": [],
+    "key": "0980482b-7d3c-4df7-ac92-c70b6644401c"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "docVersion": "1.0.0",
+  "resource": {
+    "name": "RPA_CICD",
+    "kind": "package",
+    "apiVersion": "orchestrator.uipath.com/v1",
+    "isOverridable": true,
+    "dependencies": [],
+    "runtimeDependencies": [],
+    "files": [
+      {
+        "name": "RPA_CICD.1.0.230173813.nupkg",
+        "kind": "Package",
+        "version": "1.0.230173813",
+        "url": "https://cloud.uipath.com/5cac5ae6-3ced-406c-9a8b-05ece86531d1/a4e6aa2d-8f53-4edf-9ec8-d43c06f27a91/orchestrator_/odata/Processes/UiPath.Server.Configuration.OData.DownloadPackage(key=\u0027RPA_CICD:1.0.230173813\u0027)?feedId=a0c431ee-1e4c-4e59-a608-02a4ff1b6389",
+        "key": "RPA_CICD_1.0.230173813"
+      }
+    ],
+    "folders": [
+      {
+        "fullyQualifiedName": "solution_folder"
+      }
+    ],
+    "spec": {
+      "fileName": "RPA_CICD.1.0.230173813.nupkg",
+      "fileReference": "RPA_CICD_1.0.230173813",
+      "name": "RPA_CICD",
+      "description": null
+    },
+    "locks": [],
+    "key": "RPA_CICD:1.0.230173813"
+  }
+}

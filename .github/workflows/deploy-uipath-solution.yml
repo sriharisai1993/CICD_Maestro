@@ -35,8 +35,6 @@ permissions:
 
 env:
   UIPATH_CLI_VERSION: 25.10.6
-  SOLUTION_NAME: CICD_MathAgent
-  SOLUTION_PATH: CICD_MathAgent.uipx
   SOLUTION_VERSION: 1.0.${{ github.run_number }}
   APPLICATION_SCOPE: AutomationSolutions Solutions.Deployments Solutions.Deployments.Read Solutions.Deployments.Write Solutions.Packages Solutions.Packages.Read Solutions.Packages.Write
 
@@ -50,6 +48,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Discover solution
+        run: |
+          mapfile -t solution_files < <(find "$GITHUB_WORKSPACE" -maxdepth 1 -type f -name "*.uipx" | sort)
+
+          if [ "${#solution_files[@]}" -eq 0 ]; then
+            echo "No .uipx solution file found at the repository root."
+            exit 1
+          fi
+
+          if [ "${#solution_files[@]}" -gt 1 ]; then
+            echo "Multiple .uipx solution files found at the repository root. Keep one solution file or add an explicit workflow input."
+            printf '%s\n' "${solution_files[@]}"
+            exit 1
+          fi
+
+          solution_path="${solution_files[0]}"
+          solution_file="$(basename "$solution_path")"
+          solution_name="${solution_file%.uipx}"
+
+          echo "SOLUTION_PATH=$solution_path" >> "$GITHUB_ENV"
+          echo "SOLUTION_NAME=$solution_name" >> "$GITHUB_ENV"
+
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
@@ -62,7 +82,7 @@ jobs:
 
       - name: Restore solution dependencies
         run: |
-          uipcli solution restore "$GITHUB_WORKSPACE/$SOLUTION_PATH" \
+          uipcli solution restore "$SOLUTION_PATH" \
             --restoreFolder "$RUNNER_TEMP/uipath-restore" \
             --traceLevel Information
 
@@ -76,7 +96,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/packages"
 
-          uipcli solution pack "$GITHUB_WORKSPACE/$SOLUTION_PATH" \
+          uipcli solution pack "$SOLUTION_PATH" \
             --output "$RUNNER_TEMP/packages" \
             --version "$SOLUTION_VERSION" \
             --repositoryUrl "$GIT_SERVER_URL/$GIT_REPOSITORY" \

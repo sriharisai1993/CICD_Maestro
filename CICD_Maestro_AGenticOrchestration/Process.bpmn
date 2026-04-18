@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:uipath="http://uipath.org/schema/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="x-uipath-initial-diagram" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" exporter="UiPath Studio Web (https://uipath.com)" exporterVersion="3eca7032">
+  <bpmn:process id="Process_1" name="Process" isExecutable="false">
+    <bpmn:extensionElements>
+      <uipath:variables version="v1">
+        <uipath:inputOutput id="error" name="Error" type="jsonSchema" elementId="Activity_g42rpN"><![CDATA[{"type":"object","properties":{"code":{"type":"string"},"message":{"type":"string"},"detail":{"type":"string"},"category":{"type":"string"},"status":{"type":"number"},"element":{"type":"string"}}}]]></uipath:inputOutput>
+        <uipath:inputOutput id="answer" name="answer" type="string" elementId="Activity_g42rpN" />
+        <uipath:inputOutput id="steps" name="steps" type="string" elementId="Activity_g42rpN" />
+        <uipath:inputOutput id="operationType" name="operation_type" type="string" elementId="Activity_g42rpN" />
+        <uipath:inputOutput id="error2" name="Error" type="jsonSchema" elementId="Activity_0eBMYl"><![CDATA[{"type":"object","properties":{"code":{"type":"string"},"message":{"type":"string"},"detail":{"type":"string"},"category":{"type":"string"},"status":{"type":"number"},"element":{"type":"string"}}}]]></uipath:inputOutput>
+      </uipath:variables>
+      <uipath:bindings version="v1">
+        <uipath:binding id="b8MUNyWQW" name="folderPath" type="string" resource="process" resourceSubType="Agent" resourceKey="MathAgent" propertyAttribute="folderPath" />
+        <uipath:binding id="bAN0sJJO4" name="name" type="string" default="MathAgent" resource="process" resourceSubType="Agent" resourceKey="MathAgent" propertyAttribute="name" />
+        <uipath:binding id="bRG03lbyU" name="folderPath" type="string" resource="process" resourceKey="RPA_CICD" propertyAttribute="folderPath" />
+        <uipath:binding id="bhnBrpvSE" name="name" type="string" default="RPA_CICD" resource="process" resourceKey="RPA_CICD" propertyAttribute="name" />
+      </uipath:bindings>
+      <uipath:migrationVersion version="13" />
+    </bpmn:extensionElements>
+    <bpmn:startEvent id="Event_start" name="Start event">
+      <bpmn:extensionElements>
+        <uipath:entryPointId value="8a5b4344-3013-42b3-a78a-5eb2609ceb42" />
+      </bpmn:extensionElements>
+      <bpmn:outgoing>edge_xiGpMJ</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_g42rpN" name="MathAgent">
+      <bpmn:extensionElements>
+        <uipath:activity version="v1">
+          <uipath:type value="Orchestrator.StartAgentJob" version="v2" />
+          <uipath:context>
+            <uipath:input name="name" type="string" value="=bindings.bAN0sJJO4" />
+            <uipath:input name="folderPath" type="string" value="=bindings.b8MUNyWQW" />
+            <uipath:input name="_label" type="string" value="MathAgent" />
+            <uipath:inputSchema type="jsonSchema"><![CDATA[{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"question":{"type":"string"}},"required":[]}]]></uipath:inputSchema>
+          </uipath:context>
+          <uipath:input name="JobArguments" type="json" target="bodyField"><![CDATA[{"question":"What is the square root of 256"}]]></uipath:input>
+          <uipath:output name="Error" type="jsonSchema" source="=Error" var="error" />
+          <uipath:output name="answer" type="string" source="=answer" var="answer" />
+          <uipath:output name="steps" type="string" source="=steps" var="steps" />
+          <uipath:output name="operation_type" type="string" source="=operation_type" var="operationType" />
+        </uipath:activity>
+      </bpmn:extensionElements>
+      <bpmn:incoming>edge_xiGpMJ</bpmn:incoming>
+      <bpmn:outgoing>edge_FQ27ud</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_0eBMYl" name="RPA_CICD">
+      <bpmn:extensionElements>
+        <uipath:activity version="v1">
+          <uipath:type value="Orchestrator.StartJob" version="v2" />
+          <uipath:context>
+            <uipath:input name="name" type="string" value="=bindings.bhnBrpvSE" />
+            <uipath:input name="folderPath" type="string" value="=bindings.bRG03lbyU" />
+            <uipath:input name="_label" type="string" value="RPA_CICD" />
+            <uipath:inputSchema type="jsonSchema"><![CDATA[{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"in_AgentResponse":{"type":"string"}},"required":[]}]]></uipath:inputSchema>
+          </uipath:context>
+          <uipath:input name="JobArguments" type="json" target="bodyField"><![CDATA[{"in_AgentResponse":"=vars.answer"}]]></uipath:input>
+          <uipath:output name="Error" type="jsonSchema" source="=Error" var="error2" />
+        </uipath:activity>
+      </bpmn:extensionElements>
+      <bpmn:incoming>edge_FQ27ud</bpmn:incoming>
+      <bpmn:outgoing>edge_Activity_0eBMYl-Event_xjeIwM</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_xjeIwM">
+      <bpmn:incoming>edge_Activity_0eBMYl-Event_xjeIwM</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="edge_xiGpMJ" sourceRef="Event_start" targetRef="Activity_g42rpN" />
+    <bpmn:sequenceFlow id="edge_FQ27ud" sourceRef="Activity_g42rpN" targetRef="Activity_0eBMYl" />
+    <bpmn:sequenceFlow id="edge_Activity_0eBMYl-Event_xjeIwM" sourceRef="Activity_0eBMYl" targetRef="Event_xjeIwM" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="S_Event_start" bpmnElement="Event_start">
+        <dc:Bounds x="144" y="145" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="144" y="186" width="36" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_Activity_g42rpN" bpmnElement="Activity_g42rpN">
+        <dc:Bounds x="272.171875" y="123" width="100" height="80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="272.171875" y="208" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_Activity_0eBMYl" bpmnElement="Activity_0eBMYl">
+        <dc:Bounds x="442.171875" y="123" width="100" height="80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="442.171875" y="208" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_Event_xjeIwM" bpmnElement="Event_xjeIwM">
+        <dc:Bounds x="590.171875" y="145" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="590.171875" y="186" width="36" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_edge_xiGpMJ" bpmnElement="edge_xiGpMJ">
+        <di:waypoint x="180" y="163" />
+        <di:waypoint x="272.171875" y="163" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_edge_FQ27ud" bpmnElement="edge_FQ27ud">
+        <di:waypoint x="372.171875" y="163" />
+        <di:waypoint x="442.171875" y="163" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_edge_Activity_0eBMYl-Event_xjeIwM" bpmnElement="edge_Activity_0eBMYl-Event_xjeIwM">
+        <di:waypoint x="542.171875" y="163" />
+        <di:waypoint x="590.171875" y="163" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

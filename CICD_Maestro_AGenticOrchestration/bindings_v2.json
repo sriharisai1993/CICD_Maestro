@@ -1,0 +1,50 @@
+{
+  "version": "2.0",
+  "resources": [
+    {
+      "resource": "process",
+      "key": "MathAgent",
+      "id": "processMathAgent",
+      "value": {
+        "folderPath": {
+          "isExpression": false,
+          "displayName": "Folder path"
+        },
+        "name": {
+          "defaultValue": "MathAgent",
+          "isExpression": false,
+          "displayName": "Process name"
+        }
+      },
+      "metadata": {
+        "ActivityName": "MathAgent",
+        "BindingsVersion": "2.2",
+        "DisplayLabel": "name",
+        "SolutionsSupport": "true",
+        "subType": "Agent"
+      }
+    },
+    {
+      "resource": "process",
+      "key": "RPA_CICD",
+      "id": "processRPA_CICD",
+      "value": {
+        "folderPath": {
+          "isExpression": false,
+          "displayName": "Folder path"
+        },
+        "name": {
+          "defaultValue": "RPA_CICD",
+          "isExpression": false,
+          "displayName": "Process name"
+        }
+      },
+      "metadata": {
+        "ActivityName": "RPA_CICD",
+        "BindingsVersion": "2.2",
+        "DisplayLabel": "name",
+        "SolutionsSupport": "true"
+      }
+    }
+  ]
+}

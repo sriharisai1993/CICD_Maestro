@@ -1,0 +1,26 @@
+{
+  "docVersion": "1.0.0",
+  "resource": {
+    "name": "CICD_Maestro_AGenticOrchestration",
+    "kind": "package",
+    "apiVersion": "orchestrator.uipath.com/v1",
+    "projectKey": "c0af1007-6ab3-40fa-a4e8-81e0b53ddfae",
+    "isOverridable": true,
+    "dependencies": [],
+    "runtimeDependencies": [],
+    "files": [],
+    "folders": [
+      {
+        "fullyQualifiedName": "solution_folder"
+      }
+    ],
+    "spec": {
+      "fileName": null,
+      "fileReference": null,
+      "name": "CICD_Maestro_AGenticOrchestration",
+      "description": null
+    },
+    "locks": [],
+    "key": "847c371c-c120-429f-ab7b-c4f8aae1dfb0"
+  }
+}

@@ -145,12 +145,24 @@ jobs:
           GIT_SHA: ${{ github.sha }}
           GIT_REF_NAME: ${{ github.ref_name }}
           DEPLOYMENT_FOLDER: ${{ inputs.deployment_folder || 'CICD_MathAgent' }}
+          ORCHESTRATOR_URL: ${{ secrets.ORCHESTRATOR_URL }}
+          ORCHESTRATOR_TENANT: ${{ secrets.ORCHESTRATOR_TENANT }}
+          ORG_NAME: ${{ secrets.ORG_NAME }}
+          EXTERNAL_APP_ID: ${{ secrets.EXTERNAL_APP_ID }}
+          EXTERNAL_APP_SECRET: ${{ secrets.EXTERNAL_APP_SECRET }}
         run: |
           mkdir -p "$RUNNER_TEMP/packages"
 
           uipcli solution pack "$SOLUTION_PATH" \
             --output "$RUNNER_TEMP/packages" \
             --version "$SOLUTION_VERSION" \
+            --libraryOrchestratorUrl "$ORCHESTRATOR_URL" \
+            --libraryOrchestratorTenant "$ORCHESTRATOR_TENANT" \
+            --libraryOrchestratorAccountForApp "$ORG_NAME" \
+            --libraryOrchestratorApplicationId "$EXTERNAL_APP_ID" \
+            --libraryOrchestratorApplicationSecret "$EXTERNAL_APP_SECRET" \
+            --libraryOrchestratorApplicationScope "$LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE" \
+            --libraryOrchestratorFolder "$DEPLOYMENT_FOLDER" \
             --repositoryUrl "$GIT_SERVER_URL/$GIT_REPOSITORY" \
             --repositoryCommit "$GIT_SHA" \
             --repositoryBranch "$GIT_REF_NAME" \

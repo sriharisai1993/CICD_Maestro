@@ -301,43 +301,49 @@ jobs:
             exit 1
           fi
 
-          existing_release_count="$(curl -fsS "$orchestrator_base/odata/Releases?\$filter=Name%20eq%20'$process_name'&\$count=true" \
+          existing_release_json="$(curl -fsS "$orchestrator_base/odata/Releases?\$filter=Name%20eq%20'$process_name'&\$select=Id,Key,Name,ProcessVersion&\$count=true" \
             -H "Authorization: Bearer $access_token" \
-            -H "X-UIPATH-FolderPath: $DEPLOYMENT_FOLDER" \
-            | jq -r '."@odata.count" // (.value | length)')"
+            -H "X-UIPATH-FolderPath: $DEPLOYMENT_FOLDER")"
 
-          if [ "$existing_release_count" -gt 0 ]; then
-            echo "Process '$process_name' already exists in folder '$DEPLOYMENT_FOLDER'."
-            exit 0
+          existing_release_id="$(echo "$existing_release_json" | jq -r '.value[0].Id // empty')"
+          existing_release_version="$(echo "$existing_release_json" | jq -r '.value[0].ProcessVersion // empty')"
+
+          if [ -n "$existing_release_id" ]; then
+            echo "Updating process '$process_name' from version '$existing_release_version' to the latest package version in folder '$DEPLOYMENT_FOLDER'."
+            curl -fsS -X POST "$orchestrator_base/odata/Releases($existing_release_id)/UiPath.Server.Configuration.OData.UpdateToLatestPackageVersion" \
+              -H "Authorization: Bearer $access_token" \
+              -H "Content-Type: application/json" \
+              -H "X-UIPATH-FolderPath: $DEPLOYMENT_FOLDER" \
+              --data "{}"
+          else
+            package_version="$(curl -fsS "$orchestrator_base/odata/Processes/UiPath.Server.Configuration.OData.GetProcessVersions(processId='$package_name')" \
+              -H "Authorization: Bearer $access_token" \
+              -H "X-UIPATH-FolderPath: $DEPLOYMENT_FOLDER" \
+              | jq -r '(.value | map(select(.IsLatestVersion == true)) | first | .Version) // ([.value[]] | sort_by(.Published) | last | .Version)')"
+
+            if [ -z "$package_version" ] || [ "$package_version" = "null" ]; then
+              echo "Could not find an available package version for '$package_name' in folder '$DEPLOYMENT_FOLDER'."
+              exit 1
+            fi
+
+            jq -n \
+              --arg name "$process_name" \
+              --arg processKey "$package_name" \
+              --arg processVersion "$package_version" \
+              --arg description "Created by GitHub Actions" \
+              '{
+                Name: $name,
+                ProcessKey: $processKey,
+                ProcessVersion: $processVersion,
+                Description: $description
+              }' > "$RUNNER_TEMP/create-release.json"
+
+            curl -fsS -X POST "$orchestrator_base/odata/Releases" \
+              -H "Authorization: Bearer $access_token" \
+              -H "Content-Type: application/json" \
+              -H "X-UIPATH-FolderPath: $DEPLOYMENT_FOLDER" \
+              --data @"$RUNNER_TEMP/create-release.json"
           fi
-
-          package_version="$(curl -fsS "$orchestrator_base/odata/Processes/UiPath.Server.Configuration.OData.GetProcessVersions(processId='$package_name')" \
-            -H "Authorization: Bearer $access_token" \
-            -H "X-UIPATH-FolderPath: $DEPLOYMENT_FOLDER" \
-            | jq -r '(.value | map(select(.IsLatestVersion == true)) | first | .Version) // ([.value[]] | sort_by(.Published) | last | .Version)')"
-
-          if [ -z "$package_version" ] || [ "$package_version" = "null" ]; then
-            echo "Could not find an available package version for '$package_name' in folder '$DEPLOYMENT_FOLDER'."
-            exit 1
-          fi
-
-          jq -n \
-            --arg name "$process_name" \
-            --arg processKey "$package_name" \
-            --arg processVersion "$package_version" \
-            --arg description "Created by GitHub Actions" \
-            '{
-              Name: $name,
-              ProcessKey: $processKey,
-              ProcessVersion: $processVersion,
-              Description: $description
-            }' > "$RUNNER_TEMP/create-release.json"
-
-          curl -fsS -X POST "$orchestrator_base/odata/Releases" \
-            -H "Authorization: Bearer $access_token" \
-            -H "Content-Type: application/json" \
-            -H "X-UIPATH-FolderPath: $DEPLOYMENT_FOLDER" \
-            --data @"$RUNNER_TEMP/create-release.json"
 
       - name: Upload packed solution artifact
         if: always()

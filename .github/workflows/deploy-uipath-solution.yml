@@ -34,10 +34,10 @@ permissions:
   contents: read
 
 env:
-  UIPATH_CLI_VERSION: 25.10.6
+  UIPATH_CLI_VERSION: 25.10.12
   SOLUTION_VERSION: 1.0.${{ github.run_number }}
   APPLICATION_SCOPE: AutomationSolutions Solutions.Deployments Solutions.Deployments.Read Solutions.Deployments.Write Solutions.Packages Solutions.Packages.Read Solutions.Packages.Write
-  LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE: OR.Folders OR.BackgroundTasks OR.TestSets OR.TestSetExecutions OR.TestSetSchedules OR.Settings.Read OR.Robots.Read OR.Machines.Read OR.Execution OR.Assets OR.Users.Read OR.Jobs OR.Monitoring
+  LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE: ${{ vars.LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE }}
 
 jobs:
   deploy:
@@ -70,6 +70,47 @@ jobs:
 
           echo "SOLUTION_PATH=$solution_path" >> "$GITHUB_ENV"
           echo "SOLUTION_NAME=$solution_name" >> "$GITHUB_ENV"
+
+      - name: Validate UiPath configuration
+        env:
+          ORCHESTRATOR_URL: ${{ secrets.ORCHESTRATOR_URL }}
+          ORCHESTRATOR_TENANT: ${{ secrets.ORCHESTRATOR_TENANT }}
+          ORG_NAME: ${{ secrets.ORG_NAME }}
+          EXTERNAL_APP_ID: ${{ secrets.EXTERNAL_APP_ID }}
+          EXTERNAL_APP_SECRET: ${{ secrets.EXTERNAL_APP_SECRET }}
+          LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE: ${{ vars.LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE }}
+        run: |
+          missing=()
+
+          if [ -z "$ORCHESTRATOR_URL" ]; then
+            missing+=(ORCHESTRATOR_URL)
+          fi
+
+          if [ -z "$ORCHESTRATOR_TENANT" ]; then
+            missing+=(ORCHESTRATOR_TENANT)
+          fi
+
+          if [ -z "$ORG_NAME" ]; then
+            missing+=(ORG_NAME)
+          fi
+
+          if [ -z "$EXTERNAL_APP_ID" ]; then
+            missing+=(EXTERNAL_APP_ID)
+          fi
+
+          if [ -z "$EXTERNAL_APP_SECRET" ]; then
+            missing+=(EXTERNAL_APP_SECRET)
+          fi
+
+          if [ -z "$LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE" ]; then
+            missing+=(LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE)
+          fi
+
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "Missing required UiPath GitHub secret(s) or variable(s): ${missing[*]}"
+            echo "Add secrets as repository/environment secrets, and LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE as a repository/environment variable."
+            exit 1
+          fi
 
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4

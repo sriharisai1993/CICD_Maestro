@@ -25,6 +25,11 @@ on:
         required: true
         default: CICD_MathAgent
         type: string
+      create_folder_processes:
+        description: Create or update normal folder processes after deploying the solution
+        required: true
+        default: true
+        type: boolean
       config_path:
         description: Optional solution deployment config path in this repository
         required: false
@@ -183,6 +188,40 @@ jobs:
 
           echo "PACKAGE_PATH=$package_path" >> "$GITHUB_ENV"
           echo "DEPLOYMENT_NAME=$SOLUTION_NAME-$DEPLOYMENT_FOLDER" >> "$GITHUB_ENV"
+
+      - name: Create or update folder processes
+        if: ${{ github.event_name == 'push' || inputs.create_folder_processes }}
+        env:
+          DEPLOYMENT_FOLDER: ${{ inputs.deployment_folder || 'Shared' }}
+          ORCHESTRATOR_URL: ${{ secrets.ORCHESTRATOR_URL }}
+          ORCHESTRATOR_TENANT: ${{ secrets.ORCHESTRATOR_TENANT }}
+          ORG_NAME: ${{ secrets.ORG_NAME }}
+          EXTERNAL_APP_ID: ${{ secrets.EXTERNAL_APP_ID }}
+          EXTERNAL_APP_SECRET: ${{ secrets.EXTERNAL_APP_SECRET }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/process-packages"
+
+          find "$RUNNER_TEMP/uipath-restore" "$RUNNER_TEMP/packages" \
+            -type f \
+            -name "*.nupkg" \
+            -exec cp -n {} "$RUNNER_TEMP/process-packages" \;
+
+          if ! find "$RUNNER_TEMP/process-packages" -maxdepth 1 -type f -name "*.nupkg" -print -quit | grep -q .; then
+            echo "No .nupkg package files found to deploy as folder processes."
+            exit 1
+          fi
+
+          find "$RUNNER_TEMP/process-packages" -maxdepth 1 -type f -name "*.nupkg" -print
+
+          uipcli package deploy "$RUNNER_TEMP/process-packages" "$ORCHESTRATOR_URL" "$ORCHESTRATOR_TENANT" \
+            -A "$ORG_NAME" \
+            -I "$EXTERNAL_APP_ID" \
+            -S "$EXTERNAL_APP_SECRET" \
+            --applicationScope "$LIBRARY_ORCHESTRATOR_APPLICATION_SCOPE" \
+            -o "$DEPLOYMENT_FOLDER" \
+            --createProcess true \
+            --ignoreLibraryDeployConflict \
+            --traceLevel Information
 
       - name: Upload solution package
         env:
